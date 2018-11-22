@@ -18,7 +18,7 @@ main :: IO ()
 main = do
   -- putStrLn $ show $ sort spans
   -- result <- fnTarget helpersIO "aaa"
-  result <- fnTarget helpersIO "aaa"
+  result <- fnTarget helpersIO "Question"
   print result
 
 ask :: String -> IO String
@@ -40,9 +40,9 @@ data Helpers a m where
 
 helpersIO = MonadicHelpers
             { fn1 = ask
-            , fn2 = ask
+            , fn2 = ask . reverse
             }
-            
+
 -- data Helpers a m = Helpers {
 --   fn1 :: (a -> m a)
 -- }
@@ -54,8 +54,9 @@ helpersIO = MonadicHelpers
 
 fnTarget :: Monad m => Helpers String m -> String -> m String
 fnTarget helpers q = do
-  result <- (fn1 helpers) q
-  return result
+  result1 <- (fn1 helpers) q
+  result2 <- (fn2 helpers) q
+  return $ result1 ++ " " ++ result2
 
 
 
