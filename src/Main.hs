@@ -6,7 +6,7 @@ import Data.Loc.Loc
 import Data.Loc.Span
 
 import Data.List
-
+import Control.Monad.Identity
 
 spans :: [Span]
 spans = [
@@ -18,8 +18,13 @@ main :: IO ()
 main = do
   -- putStrLn $ show $ sort spans
   -- result <- fnTarget helpersIO "aaa"
-  result <- fnTarget helpersIO "Question"
-  print result
+  resultIO <- fnTarget helpersIO "Question"
+  print resultIO
+
+  let resultId = fnTarget helpersIdentity "Question"
+  print $ runIdentity resultId
+
+
 
 ask :: String -> IO String
 ask question = do 
@@ -27,7 +32,11 @@ ask question = do
   answer <- getLine
   return $ question ++ " " ++ answer
 
-
+askId :: String -> Identity String
+askId question = do 
+  return $ question ++ " (in Identity)"
+  
+  
 -- data Helpers a m where
 --   HelpersIO :: Monad m => (a -> m a)
 -- }
@@ -42,6 +51,11 @@ helpersIO = MonadicHelpers
             { fn1 = ask
             , fn2 = ask . reverse
             }
+
+helpersIdentity = MonadicHelpers
+                  { fn1 = askId
+                  , fn2 = askId . reverse
+                  }
 
 -- data Helpers a m = Helpers {
 --   fn1 :: (a -> m a)
